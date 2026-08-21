@@ -40,7 +40,9 @@ The short command is the recommended starting point. Review these parameters
 when you change the test:
 
 - `TARGET` sets the temperature for the filament and is required.
-- `K_VALUES` sets the pressure advance range.
+- `PA_START` sets the first pressure advance value.
+- `PA_END` sets the last pressure advance value and includes it in the test.
+- `PA_STEP` sets the increment between pressure advance values.
 - `CYCLES` sets the number of measured cycles for each value.
 - `AXIS` selects the carrier axis. The default is Y.
 
@@ -79,7 +81,7 @@ cycles agreed more closely.
 Only a `valid` result includes a recommendation. For another result:
 
 - If FlowPA reports `no_boundary_within_range`, follow the console hint and
-  test lower or higher `K_VALUES`.
+  test a lower or higher PA range.
 - If FlowPA reports `provisional`, check the filament and temperature. Increase
   `CYCLES` only after you rule out a preparation problem.
 - If FlowPA reports `ambiguous`, check the preparation and Klipper log before
@@ -111,7 +113,7 @@ change the pressure advance range, cycle count, flow, timing, or carrier axis.
 For example, this command tests a wider range with five measured cycles:
 
 ```text
-FLOWTUNE_PA TARGET=210 K_VALUES=0.030,0.035,0.040,0.045,0.050,0.055 CYCLES=5
+FLOWTUNE_PA TARGET=210 PA_START=0.030 PA_END=0.055 PA_STEP=0.005 CYCLES=5
 ```
 
 ## Output files

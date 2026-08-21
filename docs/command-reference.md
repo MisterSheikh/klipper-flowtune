@@ -62,7 +62,9 @@ FLOWTUNE_PA TARGET=210
 | Parameter | Default | Description |
 | --- | ---: | --- |
 | `TARGET` | required | Hotend temperature in degrees Celsius. |
-| `K_VALUES` | `0.034,0.038,0.042,0.046,0.050` | Strictly ascending pressure advance values. |
+| `PA_START` | `0.034` | First pressure advance value in the test. |
+| `PA_END` | `0.050` | Last pressure advance value in the test. This value is included. |
+| `PA_STEP` | `0.004` | Increment between pressure advance values. The increment must land exactly on `PA_END`. |
 | `SLOW_FLOW` | `4` | Low volumetric flow in mm³/s. |
 | `FAST_FLOW` | `12` | High volumetric flow in mm³/s. |
 | `CONDITIONING_CYCLES` | `3` | Preparation cycles for each pressure advance value. |
@@ -81,12 +83,14 @@ FLOWTUNE_PA TARGET=210
 | `WOBBLE` | `0.05` | Alternating carrier-axis movement, in millimetres. |
 | `LABEL` | `flowpa` | Label stored with the result. |
 
+The range includes both endpoints and must contain between 2 and 12 values.
+
 FlowPA can report these result states:
 
 | State | Meaning |
 | --- | --- |
 | `valid` | One boundary has enough cycle support. FlowPA reports a recommendation. |
-| `no_boundary_within_range` | The tested `K_VALUES` do not contain a boundary. The console tells you whether to test lower or higher values when the data supports that direction. |
+| `no_boundary_within_range` | The tested PA range does not contain a boundary. The console tells you whether to test a lower or higher range when the data supports that direction. |
 | `provisional` | A possible boundary lacks enough cycle support. |
 | `ambiguous` | The data contains more than one possible boundary. |
 | `invalid` | The capture or sensor data failed validation. |

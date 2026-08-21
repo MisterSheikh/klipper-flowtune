@@ -131,7 +131,8 @@ def _first_pass(path):
         if value not in k_order:
             k_order.append(value)
     if any(right <= left for left, right in zip(k_order, k_order[1:])):
-        raise ValueError("production FlowPA K values must be ascending")
+        raise ValueError(
+            "production FlowPA pressure advance values must be ascending")
     return metadata, summaries[0], telemetry, transitions
 
 
@@ -596,9 +597,9 @@ def analyze_capture(path):
     if state == "no_boundary_within_range":
         values = fall["metric_values_g"]
         if values and all(value < 0.0 for value in values):
-            range_hint = "test_higher_k_values"
+            range_hint = "test_higher_pa_range"
         elif values and all(value > 0.0 for value in values):
-            range_hint = "test_lower_k_values"
+            range_hint = "test_lower_pa_range"
     recommendation = (None if state != "valid" or boundary is None else
                       float(round(boundary, 3)))
     result = {

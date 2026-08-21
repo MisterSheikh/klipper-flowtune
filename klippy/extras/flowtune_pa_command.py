@@ -42,8 +42,8 @@ def _result_message(result, report_path):
         range_hint = recommendation.get("range_hint")
         if range_hint:
             range_messages = {
-                "test_higher_k_values": "rerun with higher K_VALUES",
-                "test_lower_k_values": "rerun with lower K_VALUES",
+                "test_higher_pa_range": "rerun with a higher PA range",
+                "test_lower_pa_range": "rerun with a lower PA range",
             }
             lines.append("Range hint: %s." %
                          range_messages.get(range_hint, range_hint))
@@ -130,16 +130,20 @@ def run(host, gcmd):
     purge_flow = gcmd.get_float(
         "PURGE_FLOW", flowtune_core.FLOWPA_REFERENCE_PURGE_FLOW,
         above=0.0, maxval=50.0)
-    default_k_values = ",".join(
-        "%.3f" % value
-        for value in flowtune_core.FLOWPA_REFERENCE_PRESSURE_ADVANCES)
+    if "K_VALUES" in seen:
+        raise gcmd.error(
+            "FLOWTUNE_PA does not support K_VALUES; use PA_START, "
+            "PA_END, and PA_STEP")
     try:
-        k_values = flowtune_core.parse_pressure_advance_values(
-            gcmd.get("K_VALUES", default_k_values))
+        k_values = flowtune_core.build_pressure_advance_range(
+            gcmd.get("PA_START", "%.3f" %
+                     flowtune_core.FLOWPA_REFERENCE_PA_START),
+            gcmd.get("PA_END", "%.3f" %
+                     flowtune_core.FLOWPA_REFERENCE_PA_END),
+            gcmd.get("PA_STEP", "%.3f" %
+                     flowtune_core.FLOWPA_REFERENCE_PA_STEP))
     except ValueError as error:
         raise gcmd.error(str(error))
-    if any(right <= left for left, right in zip(k_values, k_values[1:])):
-        raise gcmd.error("FLOWTUNE_PA K_VALUES must be strictly ascending")
     label = gcmd.get("LABEL", "flowpa")
 
     filament_area = float(extruder.filament_area)
@@ -227,7 +231,7 @@ def run(host, gcmd):
     host._begin_operation(
         "pa", start_eventtime, heat_timeout + nominal_motion_s)
     gcmd.respond_info(
-        "FlowTune FlowPA armed: K=%s, %.1f->%.1f mm^3/s, %d+%d "
+        "FlowTune FlowPA armed: PA=%s, %.1f->%.1f mm^3/s, %d+%d "
         "cycles, %.2f mm filament planned; NumPy %s." % (
             ",".join("%.3f" % value for value in k_values),
             slow_flow, fast_flow, conditioning_cycles, cycles,

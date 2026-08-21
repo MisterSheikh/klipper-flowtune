@@ -15,6 +15,7 @@ from __future__ import division
 
 import copy
 import math
+from decimal import Decimal, InvalidOperation
 
 
 SCHEMA_ID = "flowtune.capture"
@@ -24,7 +25,9 @@ MAX_TEST_FLOW_LIMIT_MM3_S = 500.0
 # Q2 PLA+ reference candidate used by the current balanced FlowPA confirmation.
 # These remain command-overridable; they define a recorded reference condition,
 # not universal filament constants.
-FLOWPA_REFERENCE_PRESSURE_ADVANCES = (0.034, 0.038, 0.042, 0.046, 0.050)
+FLOWPA_REFERENCE_PA_START = 0.034
+FLOWPA_REFERENCE_PA_END = 0.050
+FLOWPA_REFERENCE_PA_STEP = 0.004
 FLOWPA_REFERENCE_SLOW_FLOW = 4.0
 FLOWPA_REFERENCE_FAST_FLOW = 12.0
 FLOWPA_REFERENCE_SLOW_TIME = 1.0
@@ -212,28 +215,75 @@ def parse_pressure_advance_values(value):
     if isinstance(value, str):
         candidates = [item.strip() for item in value.split(",")]
         if any(not item for item in candidates):
-            raise ValueError("K_VALUES must be comma-separated numbers")
+            raise ValueError(
+                "pressure advance values must be comma-separated numbers")
     else:
         try:
             candidates = list(value)
         except TypeError:
-            raise ValueError("K_VALUES must be comma-separated numbers")
+            raise ValueError(
+                "pressure advance values must be comma-separated numbers")
     if len(candidates) < 2:
-        raise ValueError("K_VALUES must contain at least two values")
+        raise ValueError(
+            "the pressure advance range must contain at least two values")
     if len(candidates) > 12:
-        raise ValueError("K_VALUES may contain at most twelve values")
+        raise ValueError(
+            "the pressure advance range may contain at most twelve values")
     values = []
     for candidate in candidates:
         try:
             candidate = float(candidate)
         except (TypeError, ValueError, OverflowError):
-            raise ValueError("K_VALUES must be comma-separated numbers")
+            raise ValueError(
+                "pressure advance values must be comma-separated numbers")
         if not math.isfinite(candidate) or not 0. <= candidate <= 1.:
-            raise ValueError("each K value must be between 0 and 1")
+            raise ValueError(
+                "each pressure advance value must be between 0 and 1")
         if candidate in values:
-            raise ValueError("K_VALUES must not contain duplicates")
+            raise ValueError("pressure advance values must not repeat")
         values.append(candidate)
     return values
+
+
+def build_pressure_advance_range(start, end, step, maximum_values=12):
+    """Build an inclusive, evenly spaced pressure advance range."""
+    raw_values = {
+        "PA_START": start,
+        "PA_END": end,
+        "PA_STEP": step,
+    }
+    values = {}
+    for name, value in raw_values.items():
+        try:
+            value = Decimal(str(value))
+        except (InvalidOperation, TypeError, ValueError):
+            raise ValueError("%s must be a finite number" % name)
+        if not value.is_finite():
+            raise ValueError("%s must be a finite number" % name)
+        values[name] = value
+
+    start = values["PA_START"]
+    end = values["PA_END"]
+    step = values["PA_STEP"]
+    if not Decimal("0") <= start <= Decimal("1"):
+        raise ValueError("PA_START must be between 0 and 1")
+    if not Decimal("0") <= end <= Decimal("1"):
+        raise ValueError("PA_END must be between 0 and 1")
+    if end <= start:
+        raise ValueError("PA_END must be greater than PA_START")
+    if step <= 0:
+        raise ValueError("PA_STEP must be greater than 0")
+
+    step_count, remainder = divmod(end - start, step)
+    if remainder:
+        raise ValueError("PA_STEP must land exactly on PA_END")
+    count = int(step_count) + 1
+    if count < 2:
+        raise ValueError("the PA range must contain at least two values")
+    if count > maximum_values:
+        raise ValueError(
+            "the PA range may contain at most %d values" % maximum_values)
+    return [float(start + step * index) for index in range(count)]
 
 
 def parse_flow_values(value, name):

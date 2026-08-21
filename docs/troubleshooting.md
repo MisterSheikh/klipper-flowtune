@@ -113,7 +113,7 @@ Fix the reported problem before you repeat the test.
 ## FlowPA produces no recommendation
 
 If the result is `no_boundary_within_range`, follow the console hint and test
-lower or higher `K_VALUES`.
+a lower or higher PA range.
 
 For a `provisional` result, check the filament preparation and temperature.
 Increase `CYCLES` only after you rule out a preparation problem.
