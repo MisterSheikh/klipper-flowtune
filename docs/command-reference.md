@@ -62,8 +62,8 @@ FLOWTUNE_PA TARGET=210
 | Parameter | Default | Description |
 | --- | ---: | --- |
 | `TARGET` | required | Hotend temperature in degrees Celsius. |
-| `PA_START` | `0.034` | First pressure advance value in the test. |
-| `PA_END` | `0.050` | Last pressure advance value in the test. This value is included. |
+| `PA_START` | `0.020` | First pressure advance value in the test. |
+| `PA_END` | `0.040` | Last pressure advance value in the test. This value is included. |
 | `PA_STEP` | `0.004` | Increment between pressure advance values. The increment must land exactly on `PA_END`. |
 | `SLOW_FLOW` | `4` | Low volumetric flow in mm³/s. |
 | `FAST_FLOW` | `12` | High volumetric flow in mm³/s. |

@@ -25,8 +25,8 @@ MAX_TEST_FLOW_LIMIT_MM3_S = 500.0
 # Q2 PLA+ reference candidate used by the current balanced FlowPA confirmation.
 # These remain command-overridable; they define a recorded reference condition,
 # not universal filament constants.
-FLOWPA_REFERENCE_PA_START = 0.034
-FLOWPA_REFERENCE_PA_END = 0.050
+FLOWPA_REFERENCE_PA_START = 0.020
+FLOWPA_REFERENCE_PA_END = 0.040
 FLOWPA_REFERENCE_PA_STEP = 0.004
 FLOWPA_REFERENCE_SLOW_FLOW = 4.0
 FLOWPA_REFERENCE_FAST_FLOW = 12.0
@@ -676,7 +676,8 @@ def plan_controlled_max_flow_budget(filament_diameter, start_flow,
     }
 
 
-def plan_pa_matrix(pressure_advances=(0.034, 0.038, 0.042, 0.046, 0.050),
+def plan_pa_matrix(pressure_advances=(0.020, 0.024, 0.028, 0.032, 0.036,
+                                      0.040),
                    low_flows=(2.0, 4.0, 6.0),
                    high_flows=(10.0, 12.0, 14.0),
                    filament_diameter=1.75, slow_time=1.0, fast_time=0.35,

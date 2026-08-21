@@ -52,12 +52,12 @@ The default test performs these actions:
    1 degree Celsius.
 2. Waits 20 seconds.
 3. Purges 30 mm of input filament at 12 mm³/s.
-4. Tests pressure advance values `0.034`, `0.038`, `0.042`, `0.046`, and
-   `0.050`.
+4. Tests pressure advance values `0.020`, `0.024`, `0.028`, `0.032`, `0.036`,
+   and `0.040`.
 5. Runs three preparation cycles and three measured cycles for each value.
 6. Restores the previous pressure advance, acceleration, and heater target.
 
-The default test uses about 150 mm of input filament.
+The default test uses about 175 mm of input filament.
 
 ## Check the result
 
@@ -65,7 +65,7 @@ A valid result looks similar to this:
 
 ```text
 FlowTune FlowPA result: valid
-Recommended PA: 0.041 (boundary 0.04145, bracket [0.038, 0.042])
+Recommended PA: 0.038 (boundary 0.03845, bracket [0.036, 0.040])
 Cycle support: 3/3; observed boundary span: 0.00084
 Report: /path/to/flowtune-pa-<timestamp>-<runid>.flowpa.json
 ```
